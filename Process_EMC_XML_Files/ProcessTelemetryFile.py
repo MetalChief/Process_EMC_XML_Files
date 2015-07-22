@@ -44,7 +44,7 @@ else:
     sys.exit('OS type not supported')
     
 #
-#  Build file header
+#  Parse files in directory
 #
 if filedirectory == '' and _platform == "win32":
     filedirectory = 'c:\Telemetryfiles\\'
