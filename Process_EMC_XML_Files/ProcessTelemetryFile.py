@@ -2,7 +2,6 @@
 from xml.etree import ElementTree as ET
 import os 
 import sys
-# filename = input("please enter filename to process: ")
 
 namespaces = {"UEM_FILE":"http://emc.com/uem/schemas/EMC_UEM_Telemetry_File_Schema", 
       "ARRAY_REG":"http://emc.com/uem/schemas/ArrayRegistrationSchema", 
@@ -10,46 +9,60 @@ namespaces = {"UEM_FILE":"http://emc.com/uem/schemas/EMC_UEM_Telemetry_File_Sche
       "FILEMETADATA":"http://emc.com/uem/schemas/Common_CLARiiON_Type_schema", 
       "SAN":"http://emc.com/uem/schemas/Common_CLARiiON_SAN_schema"}
 
-separater = ("--------------------------------------------------------------------\n")
-
-#
-#  Telemetry file location
-#
-
-if _platform == "win32":
-    filedirectory = input("Please enter directory path containing telemetry files:(c:\Telemetryfiles) ")
-elif _platform == "linux" or _platform == "linux2" or _platform == "darwin":
-    filedirectory = input("Please enter directory path containing telemetry files:(/Telemetryfiles) ")
-else:
-    sys.exit('OS type not supported')
 #
 #  Build file header
 #
+separater = ("--------------------------------------------------------------------\n")
 def print_header(arg1, arg2, arg3):
     f.write(separater)
     f.write(line2)
     f.write(separater)
     return None
 
+# Placeholder code for disk type conversion
+def convert_disk(dsktype):
+    if dsktype.text == "1":
+        disktype = "EFD"
+    elif dsktype.text == "2":
+        disktype = "15K"
+    elif dsktype.text == "3":
+        disktype = "SAS"
+    elif dsktype.text == "10":
+        disktype = "2000"
+    else: 
+        disktype = "UNKN"
+    return(disktype)
 
+#
+#  Telemetry file location
+#
+if _platform == "win32":
+    filedirectory = input("Please enter directory path containing telemetry files:(c:\Telemetryfiles) ")
+elif _platform == "linux" or _platform == "linux2" or _platform == "darwin":
+    filedirectory = input("Please enter directory path containing telemetry files:(/Telemetryfiles) ")
+else:
+    sys.exit('OS type not supported')
+    
+#
+#  Build file header
+#
 if filedirectory == '' and _platform == "win32":
     filedirectory = 'c:\Telemetryfiles\\'
 elif filedirectory == '' and (_platform == "linux" or  _platform == "linux2" or _platform == "darwin"):
     filedirectory = '/Telemetryfiles/'
 listing = os.listdir(filedirectory)    
-
 for filename in listing:
     fname, ext = os.path.splitext(filename)
     head = 0
     if ext == '.xml':
         f = open(filedirectory + filename + '.txt','w')
-        tree = ET.parse(filename)
+        tree = ET.parse(filedirectory + filename)
         root = tree.getroot()
 #
 # This code walks the telemetry XML tree using namespaces
 #
         for san in root.findall('SAN:SAN', namespaces):
-            for servers in san:
+            for servers in san.find('SAN:Servers', namespaces):
                 for server in servers.findall('SAN:Server', namespaces):
                     hostname = server.find('SAN:HostName', namespaces)
                     ipa = server.find('SAN:HostIPAddress', namespaces)
@@ -119,19 +132,6 @@ for filename in listing:
 
                 head = 0
                 totalcapacity = 0
-        # Placeholder code for disk type conversion
-                def convert_disk(dsktype):
-                     if dsktype.text == "1":
-                        disktype = "EFD"
-                     elif dsktype.text == "2":
-                        disktype = "15K"
-                     elif dsktype.text == "3":
-                        disktype = "SAS"
-                     elif dsktype.text == "10":
-                        disktype = "2000"
-                     else: 
-                        disktype = "UNKN"
-                     return(disktype)
 
         #
         # Physical Information ie. Disks
@@ -140,8 +140,6 @@ for filename in listing:
                     for storagesps in physicals.findall('CLAR:StorageProcessors', namespaces):
                         for storagesp in storagesps.findall('CLAR:StorageProcessor', namespaces):
                             spname = storagesp.find('CLAR:Name', namespaces)
-        #                   f.writelines(spname.text)
-        #                   f.writelines("\n")
                         for disks in physicals.findall('CLAR:Disks', namespaces):
                             for disk in disks.findall('CLAR:Disk', namespaces):
                                 busnum = disk.find('CLAR:Bus', namespaces)
