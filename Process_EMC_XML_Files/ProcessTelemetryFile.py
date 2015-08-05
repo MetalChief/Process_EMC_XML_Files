@@ -129,10 +129,17 @@ for filename in listing:
                             background-color: red;
                         }
                         pp {
-                            font-size: 1.5em;
-                            text-decoration: underline;
-                            margin-left: 50px;
+                            font-size: 20px;
+                            text-decoration: bold;
+                            margin-left: 60px;
+                            color: blue;
                         }
+                        ppi {
+                            font-size: 20px;
+                            text-decoration: italic;
+                            margin-left: 60px;
+                        }
+
                     </style>
                 </head>
                 <body>
@@ -170,7 +177,7 @@ for filename in listing:
                     line = (" {:<15}".format(clarmodel.text) + "{:<15}".format(clarname.text) + \
                         "{:<15}".format(serialno.text) + "{:<20}".format(clarwwn.text) + "\n")
                     f.write(line)
-                    g.write('''<pp>''' + line+ '''</pp>''')     
+                    g.write('''<pp>''' + line + '''</pp><br><br>''')     
 
 
 
@@ -186,10 +193,11 @@ for filename in listing:
                         <th>SP Connections</th>
                         <th>Device Driver</th>
                       </tr>'''
+                g.writelines('''<pp>Server Information<pp/>''')
                 g.write(html_string)
                 for server in servers.findall('SAN:Server', namespaces):
-                    hostname = server.find('SAN:HostName', namespaces)
-                    ipa = server.find('SAN:HostIPAddress', namespaces)
+                    hostname = server.find('SAN:HostName', namespaces).text
+                    ipa = server.find('SAN:HostIPAddress', namespaces).text
                     totports = 0          
                     for hbainfo in server.findall('SAN:HBAInfo', namespaces):
                         numberofports = hbainfo.find('SAN:NumberOfHBAPorts', namespaces)
@@ -197,32 +205,29 @@ for filename in listing:
                         for hbaports in hbainfo.findall('SAN:HBAPorts', namespaces):
                             for hbaport in hbaports.findall('SAN:HBAPort', namespaces):
                                 devicedrivername = hbaport.find('SAN:DeviceDriverName', namespaces)
+                                if devicedrivername is None:
+                                   devicedname ="UNKNOWN"
+                                else:
+                                   devicedname = hbaport.find('SAN:DeviceDriverName', namespaces).text
                                 vendordescription = hbaport.find('SAN:VendorDescription', namespaces)
+                                if vendordescription is None:
+                                   vendordesc ="UNKNOWN"
+                                else:
+                                   vendordesc = hbaport.find('SAN:VendorDescription', namespaces).text                              
                                 if head == 0:
                                    line2 = ("     Host Info     \n")
                                    print_header(separater, line2, separater)
-                                   head = 1
-                                if devicedrivername is None:
-                                   line = (" {:<30}".format(hostname.text) + " {:50}".format(vendordescription.text) + "\n" + \
-                                       "            {:<18}".format(ipa.text) + "{:<2}".format(str(totports)) + "\n")
-                                   f.write(line)
-                                   g.write('''<tr> <td>''' + " {:<30}".format(hostname.text) + '''</td>''' + \
-                                        '''<td>''' + " {:50}".format(vendordescription.text) +'''</td>''' + \
-                                        '''<td>''' + "{:<18}".format(ipa.text) + '''</td>''' + \
-                                        '''<td>''' + "{:<2}".format(str(totports))  + '''</td>''' + \
-                                        '''<td>''' + '''UNKNOWN'''  + '''</td></tr>''')                         
-                                else:
-                                   line = (" {:<30}".format(hostname.text)  +" {:50}".format(vendordescription.text) + "\n" +\
-                                       "            {:<18}".format(ipa.text) + \
-                                       "{:<2}".format(str(totports)) + devicedrivername.text +"\n")
-                                   f.write(line)                           
-                                   g.write('''<tr> <td>''' + " {:<30}".format(hostname.text) + '''</td>''' + \
-                                        '''<td>''' + " {:50}".format(vendordescription.text) +'''</td>''' + \
-                                        '''<td>''' + "{:<18}".format(ipa.text) + '''</td>''' + \
-                                        '''<td>''' + "{:<2}".format(str(totports))  + '''</td>''' + \
-                                        '''<td>''' + devicedrivername.text  + '''</td></tr>''') 
-                                      
-                g.write('''</table>''')      
+                                   head = 0                                
+                                line = (" {:<30}".format(hostname)  +" {:50}".format(vendordesc) + "\n" +\
+                                    "            {:<18}".format(ipa) + \
+                                    "{:<2}".format(str(totports)) + devicedname +"\n")
+                                f.write(line)                           
+                                g.write('''<tr> <td>''' + " {:<30}".format(hostname) + '''</td>''' + \
+                                    '''<td>''' + " {:50}".format(vendordesc) +'''</td>''' + \
+                                    '''<td>''' + "{:<18}".format(ipa) + '''</td>''' + \
+                                    '''<td>''' + "{:<2}".format(str(totports))  + '''</td>''' + \
+                                    '''<td>''' + devicedname  + '''</td></tr>''')                                     
+                g.write('''</table><br>''')      
 
 #
 # Software Information
@@ -237,6 +242,7 @@ for filename in listing:
                         <th>Description</th>
                         <th>Active?</th>
                       </tr>'''
+                    g.writelines('''<pp>Software Information<pp/>''')   
                     g.write(html_string)
                     for software in softwares.findall('CLAR:Software', namespaces):
                         softname = software.find('CLAR:Name', namespaces)
@@ -258,7 +264,7 @@ for filename in listing:
                                     '''<td>''' + " {:20}".format(softrev.text) +'''</td>''' + \
                                     '''<td>''' + "{:<55}".format(softdescr.text) + '''</td>''' + \
                                     '''<td>''' + "{:<10}".format(active)  + '''</td></tr>''')   
-                          
+                    g.write('''</table><br>''')      
                 
 
 #
@@ -318,6 +324,7 @@ for filename in listing:
                     '''<td>''' + " " + '''</td>''' + \
                     '''<td>''' + "Total Capacity"  + '''</td>''' + \
                     '''<td>''' + str("{0:.2f}".format(totalcapacity)) + '''</tr>''')
+                g.write('''</table><br>''')  
 #
 # RaidGroup Information
 #
@@ -381,6 +388,7 @@ for filename in listing:
                                         '''<td>''' + "{:<5}".format(slot.text) + '''</tr>''')
                                     f.write(line)
                                 f.write("\n" + separater)
+                    g.write('''</table><br>''')  
 #
 #  Write the end of the HTML file
 #
