@@ -171,9 +171,9 @@ for filename in listing:
                     clarwwn = clariion.find('CLAR:WWN', namespaces)
                     clarmodel = clariion.find('CLAR:ModelNumber', namespaces)
                     if head == 0:
-                       line2 = ("      Array Info    \n")
-                       print_header(separater, line2, separater)
-                       head = 1
+                        line2 = ("      Array Info    \n")
+                        print_header(separater, line2, separater)
+                        head = 1
                     line = (" {:<15}".format(clarmodel.text) + "{:<15}".format(clarname.text) + \
                         "{:<15}".format(serialno.text) + "{:<20}".format(clarwwn.text) + "\n")
                     f.write(line)
@@ -206,18 +206,18 @@ for filename in listing:
                             for hbaport in hbaports.findall('SAN:HBAPort', namespaces):
                                 devicedrivername = hbaport.find('SAN:DeviceDriverName', namespaces)
                                 if devicedrivername is None:
-                                   devicedname ="UNKNOWN"
+                                    devicedname ="UNKNOWN"
                                 else:
-                                   devicedname = hbaport.find('SAN:DeviceDriverName', namespaces).text
+                                    devicedname = hbaport.find('SAN:DeviceDriverName', namespaces).text
                                 vendordescription = hbaport.find('SAN:VendorDescription', namespaces)
                                 if vendordescription is None:
-                                   vendordesc ="UNKNOWN"
+                                    vendordesc ="UNKNOWN"
                                 else:
-                                   vendordesc = hbaport.find('SAN:VendorDescription', namespaces).text                              
+                                    vendordesc = hbaport.find('SAN:VendorDescription', namespaces).text                              
                                 if head == 0:
-                                   line2 = ("     Host Info     \n")
-                                   print_header(separater, line2, separater)
-                                   head = 0                                
+                                    line2 = ("     Host Info     \n")
+                                    print_header(separater, line2, separater)
+                                    head = 0                                
                                 line = (" {:<30}".format(hostname)  +" {:50}".format(vendordesc) + "\n" +\
                                     "            {:<18}".format(ipa) + \
                                     "{:<2}".format(str(totports)) + devicedname +"\n")
@@ -251,7 +251,7 @@ for filename in listing:
                         softisactive = software.find('CLAR:IsActive', namespaces)
                         active = "Not Active"
                         if softisactive.text == "true":
-                           active = "Active"
+                            active = "Active"
                         if head == 0:
                             line2 = ("     Software Info  \n")
                             print_header(separater, line2, separater)
@@ -300,13 +300,13 @@ for filename in listing:
                                 totalcapacity = totalcapacity + capgb
                                 disktype = convert_disk(dsktype)
                                 if head == 0:
-                                   line2 = ("      Disk Info     \n")
-                                   print_header(separater, line2, separater)
-                                   head = 1
+                                    line2 = ("      Disk Info     \n")
+                                    print_header(separater, line2, separater)
+                                    head = 1
                                 if dskproduct is None:
-                                   dskshortname = "EMPTY SLOT "
+                                    dskshortname = "EMPTY SLOT "
                                 else:
-                                   dskshortname = dskproduct.text[-8:]
+                                    dskshortname = dskproduct.text[-8:]
                                 line = ("  Bus Number: " + "{:<5}".format(busnum.text) + " Enclosure: " + \
                                        "{:<5}".format(encnum.text) + "Slot: " + "{:<5}".format(slotnum.text) + \
                                        " Disk Type: " +  "{:<15}".format(dskshortname) + " Capacity(GB) = " + \
@@ -341,9 +341,9 @@ for filename in listing:
                               </tr>'''
 
                         if head == 0:
-                           line2 = ("     Raid Group Info     \n")
-                           print_header(separater, line2, separater)
-                           head = 1
+                            line2 = ("     Raid Group Info     \n")
+                            print_header(separater, line2, separater)
+                            head = 1
                         for raidgroup in raidgroups.findall('CLAR:RAIDGroup', namespaces):
                             raidgrpid = raidgroup.find('CLAR:ID', namespaces)
                             raidgrpfree = int(raidgroup.find('CLAR:FreeSpace', namespaces).text) /2048 /1024
@@ -362,10 +362,10 @@ for filename in listing:
 #
                             head = 0
                             if head == 0:
-                               line2 = ("     Raid Group Disks     \n")
-                               print_header(separater, line2, separater)
-                               head = 1
-                               rghtml = rghtml + line2 
+                                line2 = ("     Raid Group Disks     \n")
+                                print_header(separater, line2, separater)
+                                head = 1
+                                rghtml = rghtml + line2 
                             for rdsks in raidgroup.findall('CLAR:Disks', namespaces):
                                 html_string = '''
                                      <table id="Table1">
